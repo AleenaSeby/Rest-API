@@ -87,3 +87,54 @@ These pieces together provide stateless authentication (JWT) and per-resource au
 
 # Rest-API
 Provide a private contacts API where authenticated users can create, read, update and delete only their own contacts.
+
+The **MVC (Model-View-Controller) + Routes/Middleware** architecture, which is standard for Express APIs.
+
+Here's the breakdown:
+
+**Architecture Layers**
+**1. Routes (routes/)**
+
+contactRoutes.js — define HTTP endpoints (GET /api/contacts, POST /api/contacts/:id, etc.)
+userRoutes.js — define auth endpoints (POST /api/users/register, POST /api/users/login)
+**Routes are mounted in server.js with app.use()**
+**2. Controllers (controllers/)**
+
+contactControllers.js — business logic for CRUD operations on contacts
+userController.js — business logic for registration, login, getCurrentUser
+**Controllers handle request/response and call models**
+**3. Models (models/)**
+
+contactModel.js — Mongoose schema + model for Contact collection
+userModel.js — Mongoose schema + model for User collection
+**Models define DB structure and validation**
+**4. Middleware (middleware/)**
+
+validateTokenHandler.js — JWT authentication (protects private routes)
+errorHandler.js — centralized error handling (catches thrown errors)
+**Middleware runs before/between routes**
+**5. Config (config/)**
+
+dbConnection.js — MongoDB/Mongoose connection wrapper
+**6. Entry point
+**
+server.js — loads env vars, connects DB, attaches middleware, mounts routes
+**Flow diagram
+HTTP Request
+    ↓
+server.js (dotenv, DB, middleware stack)
+    ↓
+routes/ (endpoint + HTTP method)
+    ↓
+middleware/ (validateTokenHandler checks JWT)
+    ↓
+controllers/ (business logic, calls models)
+    ↓
+models/ (queries MongoDB via Mongoose)
+    ↓
+Response (JSON + status code)**
+**Pattern name**
+This is Express **MVC or Layered/N-Tier architecture:**
+Separation of concerns: routes don't touch DB directly; controllers don't define schemas.
+Reusability: models can be used by multiple controllers; middleware can protect multiple routes.
+Testability: each layer can be tested in isolation.
